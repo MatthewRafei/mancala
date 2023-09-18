@@ -10,7 +10,7 @@
 
 struct MANACALA_BOARD{
     int pits[14];
-    bool current_player_turn = 1;
+    bool current_player_turn = 0;
 };
 
 void print_current_player(MANACALA_BOARD *board)
@@ -25,9 +25,12 @@ void fill_board(struct MANACALA_BOARD *board)
             board->pits[i] = 0;
         }
         else{
-            board->pits[i] = 4;
+            board->pits[i] = 0;
         }
     }
+
+    board->pits[1] = 1;
+    board->pits[12] = 1;
 }
 
 // Consider changing this to learn more about this.
@@ -96,18 +99,18 @@ void move_pit(struct MANACALA_BOARD *board, int index_pick)
     int pieces_in_hand = board->pits[index_pick];
     board->pits[index_pick] = 0;
 
+    int current_player_goal = (board->current_player_turn == 0) ? PLAYER_ONE_GOAL : PLAYER_TWO_GOAL;
+    int opponet_goal = (current_player_goal == PLAYER_ONE_GOAL) ? PLAYER_TWO_GOAL : PLAYER_ONE_GOAL;
+
     while(pieces_in_hand != 0){
 
-        index_pick += 1;
+        index_pick = (index_pick + 1) % 14;
 
-        if(index_pick > 13 || index_pick < 0){
-            index_pick = 0;
-        }
 
-        // Figure out how to calculate the player goal without using define to simplify this block of code
-        if(board->current_player_turn == 0 && index_pick != PLAYER_TWO_GOAL && pieces_in_hand > 0){
+
+        if(index_pick != opponet_goal && pieces_in_hand > 0){
             if((pieces_in_hand == 1 && board->pits[index_pick] == 0) && board->pits[14 - index_pick] > 0){
-                board->pits[PLAYER_ONE_GOAL] += (board->pits[14 - index_pick] + pieces_in_hand);
+                board->pits[current_player_goal] += (board->pits[14 - index_pick] + pieces_in_hand);
                 pieces_in_hand--;
                 board->pits[14 - index_pick] = 0;
             }
@@ -116,18 +119,6 @@ void move_pit(struct MANACALA_BOARD *board, int index_pick)
                 board->pits[index_pick] += 1;
             }
         }
-        else if(board->current_player_turn == 1 && index_pick != PLAYER_ONE_GOAL && pieces_in_hand > 0){
-            if((pieces_in_hand == 1 && board->pits[index_pick] == 0) && board->pits[14 - index_pick] > 0){
-                board->pits[PLAYER_TWO_GOAL] += (board->pits[14 - index_pick] + pieces_in_hand);
-                pieces_in_hand--;
-                board->pits[14 - index_pick] = 0;
-            }
-            else{
-                pieces_in_hand--;
-                board->pits[index_pick] += 1;
-            }
-        }
-
     }
     board->current_player_turn = !board->current_player_turn;
     print_board(board);
@@ -142,7 +133,7 @@ int main()
 
     print_board(&board);
 
-    move_pit(&board, 12);
+    move_pit(&board, 1);
 
     std::cout << std::endl;
 
