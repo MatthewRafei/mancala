@@ -6,11 +6,9 @@
 #define PLAYER_ONE_GOAL 7
 #define PLAYER_TWO_GOAL 0
 
-// Player 1 can only pick 1-6 and player 2 can only pick 8-13
-
 struct MANACALA_BOARD{
     int pits[14];
-    bool current_player_turn = 0;
+    bool current_player_turn = 1;
 };
 
 void print_current_player(MANACALA_BOARD *board)
@@ -25,17 +23,19 @@ void fill_board(struct MANACALA_BOARD *board)
             board->pits[i] = 0;
         }
         else{
-            board->pits[i] = 0;
+            board->pits[i] = 4;
         }
     }
 
-    board->pits[1] = 1;
-    board->pits[12] = 1;
+    //board->pits[1] = 1;
+    //board->pits[13] = 1;
 }
 
-// Consider changing this to learn more about this.
 void print_board(struct MANACALA_BOARD *board)
 {
+    print_current_player(board);
+
+
     // STRING STREAM?
     std::stringstream current_board;
 
@@ -66,17 +66,8 @@ void print_board(struct MANACALA_BOARD *board)
     std::cout << current_board.str() << std::endl;
 }
 
-void print_board_basic(MANACALA_BOARD *board)
-{
-    for(int i = 0; i <= BOARD_INDEX; i++){
-        std::cout << board->pits[i] << std::endl;
-    }
-}
-
 void move_pit(struct MANACALA_BOARD *board, int index_pick)
 {
-    print_current_player(board);
-
     if(index_pick == PLAYER_ONE_GOAL || index_pick == PLAYER_TWO_GOAL){
         std::cout << "You can not pick a player goal" << std::endl;
         return;
@@ -107,7 +98,7 @@ void move_pit(struct MANACALA_BOARD *board, int index_pick)
         index_pick = (index_pick + 1) % 14;
 
         if(index_pick != opponet_goal && pieces_in_hand > 0){
-            if((pieces_in_hand == 1 && board->pits[index_pick] == 0) && board->pits[14 - index_pick] > 0){
+            if((pieces_in_hand == 1 && board->pits[index_pick] == 0) && board->pits[index_pick] != current_player_goal && board->pits[14 - index_pick] > 0){
                 board->pits[current_player_goal] += (board->pits[14 - index_pick] + pieces_in_hand);
                 pieces_in_hand--;
                 board->pits[14 - index_pick] = 0;
@@ -118,7 +109,38 @@ void move_pit(struct MANACALA_BOARD *board, int index_pick)
             }
         }
     }
+
+    // Terrible code to jot the logic down so I can work on it later
+    if(board->current_player_turn == 0){
+        int current_player_total_pieces = 0;
+        for(int i = 1; i < 6; i++){
+            current_player_total_pieces += board->pits[i];
+        }
+        if(current_player_total_pieces == 0){
+            for(int i = 8; i < 13; i++){
+                //current_player_total_pieces += board->pits[i];
+                board->pits[PLAYER_TWO_GOAL] += board->pits[i];
+                board->pits[i] = 0;
+            }
+        }
+    }
+    else{
+        int current_player_total_pieces = 0;
+        for(int i = 8; i < 13; i++){
+            current_player_total_pieces += board->pits[i];
+        }
+        if(current_player_total_pieces == 0){
+            for(int i = 1; i < 6; i++){
+                //current_player_total_pieces += board->pits[i];
+                board->pits[PLAYER_ONE_GOAL] += board->pits[i];
+                board->pits[i] = 0;
+            }
+        }
+    }
+    // END OF TERRIBLE CODE.... I HOPE LOL
+
     board->current_player_turn = !board->current_player_turn;
+    print_board(board);
 }
 
 
@@ -130,7 +152,7 @@ int main()
 
     print_board(&board);
 
-    move_pit(&board, 1);
+    move_pit(&board, 13);
 
     std::cout << std::endl;
 
