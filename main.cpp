@@ -1,9 +1,12 @@
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 
 #define BOARD_INDEX 13
-#define PLAYER_ONE_GOAL 0
-#define PLAYER_TWO_GOAL 7
+#define PLAYER_ONE_GOAL 7
+#define PLAYER_TWO_GOAL 0
 
+// Player 1 can only pick 1-6 and player 2 can only pick 8-1
 
 struct MANACALA_BOARD{
     int pits[14];
@@ -11,6 +14,11 @@ struct MANACALA_BOARD{
     int player_two_score = 0;
     bool current_player_turn = 0;
 };
+
+void print_current_player(MANACALA_BOARD *board)
+{
+    std::cout << "CURRENT PLAYER: " << board->current_player_turn << std::endl;
+}
 
 void fill_board(struct MANACALA_BOARD *board)
 {
@@ -24,19 +32,62 @@ void fill_board(struct MANACALA_BOARD *board)
     }
 }
 
-// Gonna need to make you look a lot prettier
+// Indexing is incorrect, FIX THIS
 void print_board(struct MANACALA_BOARD *board)
+{
+    // STRING STREAM?
+    std::stringstream current_board;
+
+    // Player 1 goal print
+    current_board << " " << board->pits[PLAYER_TWO_GOAL] << " |";
+
+
+    for(int i{0}; i < 6; i++){
+        current_board << std::setw(3) << std::right << board->pits[13 - i];
+    }
+
+    current_board << " |";
+
+    // This prints the active player symbol
+    if(board->current_player_turn == 1){
+        current_board << " *\n - |";
+    }
+    else{
+        current_board << " -\n * |";
+    }
+
+    for(int j{1}; j < 7; j++){
+        current_board << std::setw(3) << std::right << board->pits[j];
+    }
+
+    current_board << " |" << std::setw(3) << std::right << board->pits[PLAYER_ONE_GOAL] << "\n";
+
+    // This prints the board
+    std::cout << current_board.str() << std::endl;
+}
+
+void print_board_basic(MANACALA_BOARD *board)
 {
     for(int i = 0; i <= BOARD_INDEX; i++){
         std::cout << board->pits[i] << std::endl;
     }
 }
 
-void move_pit(struct MANACALA_BOARD *board, int index_pick, int pieces_in_hand)
+void move_pit(struct MANACALA_BOARD *board, int index_pick)
 {
+    print_current_player(board);
 
     if(index_pick == PLAYER_ONE_GOAL || index_pick == PLAYER_TWO_GOAL){
         std::cout << "You can not pick a player goal" << std::endl;
+        return;
+    }
+
+    if(board->current_player_turn == 0 && (index_pick > 6 || index_pick < 1)){
+        std::cout << "Pick from the pits only avalible to you" << std::endl;
+        return;
+    }
+    else if(board->current_player_turn == 1 && (index_pick > 13 || index_pick < 8)){
+        std::cout << "Pick from the pits only avalible to you" << std::endl;
         return;
     }
 
@@ -45,24 +96,41 @@ void move_pit(struct MANACALA_BOARD *board, int index_pick, int pieces_in_hand)
         return;
     }
 
-    // We need to come up with a way to move counter clockwise while decrementing and adding +1 to every pit along the way excluding the other players goal.
-    // Maybe subtracting and finding the difference from the board and what we have in hand?
-    for(int i = board->pits[index_pick] + pieces_in_hand, current_index = index_pick; i > 0;){
+    int pieces_in_hand = board->pits[index_pick];
+    board->pits[index_pick] = 0;
 
-        current_index += 1;
+    while(pieces_in_hand != 0){
 
-        if(current_index != PLAYER_ONE_GOAL || current_index != PLAYER_TWO_GOAL){
-            // This adds 1 to whatever the value of that index is
-            board->pits[current_index] += 1;
-            i--;
-            //std::cout << board->pits[current_index] << std::endl;
+        index_pick += 1;
+
+        if(index_pick > 13 || index_pick < 0){
+            index_pick = 0;
+        }
+
+        // If your last piece lands on an empty pit take the pieces across from the board 
+        if(board->current_player_turn == 0 && index_pick != PLAYER_TWO_GOAL && pieces_in_hand > 0){
+            if((pieces_in_hand == 1 && board->pits[index_pick] == 0) && board->pits[14 - index_pick] > 0){
+                board->player_one_score += (board->pits[14 - index_pick] + 1);
+            }
+            else{
+                pieces_in_hand--;
+                board->pits[index_pick] += 1;
+            }
+        }
+        else if(board->current_player_turn == 1 && index_pick != PLAYER_ONE_GOAL && pieces_in_hand > 0){
+            if((pieces_in_hand == 1 && board->pits[index_pick] == 0) && board->pits[14 - index_pick] > 0){
+                board->player_two_score += (board->pits[14 - index_pick] + 1);
+            }
+            else{
+                pieces_in_hand--;
+                board->pits[index_pick] += 1;
+            }
         }
     }
-
-    /*if(board->pits[current_index] > 0){
-        move_pit(board, current_index, pieces_in_hand);
-    }*/
+    board->current_player_turn = !board->current_player_turn;
+    print_board(board);
 }
+
 
 int main()
 {
@@ -70,11 +138,13 @@ int main()
 
     fill_board(&board);
 
-    //print_board(&board);
+    while(true){
+        int x = 0;
+        std::cout << "Pick pit: ";
+        std::cin >> x;
+        move_pit(&board, x);
+    }
 
-    move_pit(&board, 1, 0);
 
-    print_board(&board);
-    
     return 0;
 }
