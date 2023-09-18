@@ -6,7 +6,7 @@
 #define PLAYER_ONE_GOAL 7
 #define PLAYER_TWO_GOAL 0
 
-// Player 1 can only pick 1-6 and player 2 can only pick 8-1
+// Player 1 can only pick 1-6 and player 2 can only pick 8-13
 
 struct MANACALA_BOARD{
     int pits[14];
