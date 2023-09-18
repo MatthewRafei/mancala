@@ -73,6 +73,7 @@ void move_pit(struct MANACALA_BOARD *board, int index_pick)
         return;
     }
 
+    // Change this too while your at it
     if(board->current_player_turn == 0 && (index_pick > 6 || index_pick < 1)){
         std::cout << "Pick from the pits only avalible to you" << std::endl;
         return;
