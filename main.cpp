@@ -106,8 +106,6 @@ void move_pit(struct MANACALA_BOARD *board, int index_pick)
 
         index_pick = (index_pick + 1) % 14;
 
-
-
         if(index_pick != opponet_goal && pieces_in_hand > 0){
             if((pieces_in_hand == 1 && board->pits[index_pick] == 0) && board->pits[14 - index_pick] > 0){
                 board->pits[current_player_goal] += (board->pits[14 - index_pick] + pieces_in_hand);
@@ -121,7 +119,6 @@ void move_pit(struct MANACALA_BOARD *board, int index_pick)
         }
     }
     board->current_player_turn = !board->current_player_turn;
-    print_board(board);
 }
 
 
