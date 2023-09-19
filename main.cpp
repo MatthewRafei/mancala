@@ -8,7 +8,7 @@
 
 struct MANACALA_BOARD{
     int pits[14];
-    bool current_player_turn = 1;
+    bool current_player_turn = 0;
 };
 
 void print_current_player(MANACALA_BOARD *board)
@@ -33,9 +33,6 @@ void fill_board(struct MANACALA_BOARD *board)
 
 void print_board(struct MANACALA_BOARD *board)
 {
-    print_current_player(board);
-
-
     // STRING STREAM?
     std::stringstream current_board;
 
@@ -49,7 +46,7 @@ void print_board(struct MANACALA_BOARD *board)
     current_board << " |";
 
     // This prints the active player symbol
-    if(board->current_player_turn == 1){
+    if(board->current_player_turn == 0){
         current_board << " *\n - |";
     }
     else{
@@ -99,10 +96,21 @@ void move_pit(struct MANACALA_BOARD *board, int index_pick)
         index_pick = (index_pick + 1) % 14;
 
         if(index_pick != opponet_goal && pieces_in_hand > 0){
+
+
+
             if((pieces_in_hand == 1 && board->pits[index_pick] == 0) && board->pits[index_pick] != current_player_goal && board->pits[14 - index_pick] > 0){
                 board->pits[current_player_goal] += (board->pits[14 - index_pick] + pieces_in_hand);
                 pieces_in_hand--;
                 board->pits[14 - index_pick] = 0;
+                print_current_player(board);
+                board->current_player_turn = !board->current_player_turn;
+                return;
+            }
+            else if(pieces_in_hand == 1 && index_pick == current_player_goal){
+                pieces_in_hand--;
+                board->pits[index_pick] += 1;
+                return;
             }
             else{
                 pieces_in_hand--;
@@ -139,9 +147,8 @@ void move_pit(struct MANACALA_BOARD *board, int index_pick)
         }
     }
     // END OF TERRIBLE CODE.... I HOPE LOL
-
+    print_current_player(board);
     board->current_player_turn = !board->current_player_turn;
-    print_board(board);
 }
 
 
@@ -153,9 +160,52 @@ int main()
 
     print_board(&board);
 
-    move_pit(&board, 13);
+    // p0
+    move_pit(&board, 1);
+    print_board(&board);
 
-    std::cout << std::endl;
+    //p1
+    move_pit(&board, 12);
+    print_board(&board);
+    
+    //p0
+    move_pit(&board, 1);
+    print_board(&board);
+
+    //p1
+    // BUG
+    // PIECES NOT MOVING FROM OPPOSITE SIDE TO CURRENT PLAYER GOAL WHEN CURRENT PLAYERS PIECE LANDS IN EMPTY SPACE
+    move_pit(&board, 8);
+    print_board(&board);
+
+    /*
+    move_pit(&board, 4);
+    print_board(&board);
+
+    move_pit(&board, 5);
+    print_board(&board);
+
+    move_pit(&board, 6);
+    print_board(&board);
+
+    move_pit(&board, 1);
+    print_board(&board);
+
+    move_pit(&board, 6);
+    print_board(&board);
+
+    move_pit(&board, 3);
+    print_board(&board);
+
+    move_pit(&board, 6);
+    print_board(&board);
+
+    move_pit(&board, 1);
+    print_board(&board);
+
+    move_pit(&board, 2);
+    print_board(&board);
+    */
 
     return 0;
 }
