@@ -70,12 +70,7 @@ void move_pit(struct MANACALA_BOARD *board, int index_pick)
         return;
     }
 
-    // Change this too while your at it
-    if(board->current_player_turn == 0 && (index_pick > 6 || index_pick < 1)){
-        std::cout << "Pick from the pits only avalible to you" << std::endl;
-        return;
-    }
-    else if(board->current_player_turn == 1 && (index_pick > 13 || index_pick < 8)){
+    if(index_pick > 6 + (7 * board->current_player_turn) && index_pick < 1 + (7 * board->current_player_turn)){
         std::cout << "Pick from the pits only avalible to you" << std::endl;
         return;
     }
@@ -97,22 +92,23 @@ void move_pit(struct MANACALA_BOARD *board, int index_pick)
 
         if(index_pick != opponet_goal && pieces_in_hand > 0){
 
-
-
-            if((pieces_in_hand == 1 && board->pits[index_pick] == 0) && board->pits[index_pick] != current_player_goal && board->pits[14 - index_pick] > 0){
+            if(pieces_in_hand == 1 && board->pits[index_pick] == 0 && board->pits[14 - index_pick] > 0 && index_pick != current_player_goal && index_pick < 6 + (7 * board->current_player_turn) && index_pick > 1 + (7 * board->current_player_turn)){
+                std::cout << "CON 1" << std::endl;
                 board->pits[current_player_goal] += (board->pits[14 - index_pick] + pieces_in_hand);
                 pieces_in_hand--;
                 board->pits[14 - index_pick] = 0;
-                print_current_player(board);
                 board->current_player_turn = !board->current_player_turn;
                 return;
+
             }
             else if(pieces_in_hand == 1 && index_pick == current_player_goal){
+                std::cout << "CON 2" << std::endl;
                 pieces_in_hand--;
                 board->pits[index_pick] += 1;
                 return;
             }
             else{
+                std::cout << "CON 3" << std::endl;
                 pieces_in_hand--;
                 board->pits[index_pick] += 1;
             }
@@ -127,7 +123,7 @@ void move_pit(struct MANACALA_BOARD *board, int index_pick)
         }
         if(current_player_total_pieces == 0){
             for(int i = 8; i < 13; i++){
-                //current_player_total_pieces += board->pits[i];
+                current_player_total_pieces += board->pits[i];
                 board->pits[PLAYER_TWO_GOAL] += board->pits[i];
                 board->pits[i] = 0;
             }
@@ -140,13 +136,14 @@ void move_pit(struct MANACALA_BOARD *board, int index_pick)
         }
         if(current_player_total_pieces == 0){
             for(int i = 1; i < 6; i++){
-                //current_player_total_pieces += board->pits[i];
+                current_player_total_pieces += board->pits[i];
                 board->pits[PLAYER_ONE_GOAL] += board->pits[i];
                 board->pits[i] = 0;
             }
         }
     }
     // END OF TERRIBLE CODE.... I HOPE LOL
+
     print_current_player(board);
     board->current_player_turn = !board->current_player_turn;
 }
@@ -173,39 +170,44 @@ int main()
     print_board(&board);
 
     //p1
-    // BUG
-    // PIECES NOT MOVING FROM OPPOSITE SIDE TO CURRENT PLAYER GOAL WHEN CURRENT PLAYERS PIECE LANDS IN EMPTY SPACE
     move_pit(&board, 8);
     print_board(&board);
 
-    /*
-    move_pit(&board, 4);
-    print_board(&board);
-
-    move_pit(&board, 5);
-    print_board(&board);
-
-    move_pit(&board, 6);
-    print_board(&board);
-
-    move_pit(&board, 1);
-    print_board(&board);
-
-    move_pit(&board, 6);
-    print_board(&board);
-
+    //p0
     move_pit(&board, 3);
     print_board(&board);
 
+    //p1
+    move_pit(&board, 9);
+    print_board(&board);
+
+    //p1
+    move_pit(&board, 8);
+    print_board(&board);
+
+    //p0
     move_pit(&board, 6);
     print_board(&board);
 
-    move_pit(&board, 1);
+    //p1
+    move_pit(&board, 8);
     print_board(&board);
 
-    move_pit(&board, 2);
+    //p0
+    move_pit(&board, 4);
     print_board(&board);
-    */
+
+    //p1
+    move_pit(&board, 8);
+    print_board(&board);
+
+    //p0
+    move_pit(&board, 6);
+    print_board(&board);
+    
+    //p0
+    move_pit(&board, 5);
+    print_board(&board);
 
     return 0;
 }
