@@ -105,8 +105,6 @@ void move(struct MANACALA_BOARD *board, int current_index)
         return;
     }
 
-    // Because there was one last index I was putting in the hand making all indexs on player side zero these conditions ran pre-maturely
-    // But now this condition isn't getting checked after a move is finished....
     int pieces_in_hand = board->pits[current_index];
     board->pits[current_index] = 0;
 
@@ -126,7 +124,6 @@ void move(struct MANACALA_BOARD *board, int current_index)
             pieces_in_hand--;
             board->pits[14 - current_index] = 0;
             board->current_player_turn = !board->current_player_turn;
-            // check if player field is empty
             if(board->pits[1] == 0 && board->pits[2] == 0 && board->pits[3] == 0 && board->pits[4] == 0 && board->pits[5] == 0 && board->pits[6] == 0 && pieces_in_hand <= 0){
                 for(int i = 8; i <= 13; i++){
                     board->pits[PLAYER_TWO_GOAL] += board->pits[i];
@@ -142,8 +139,6 @@ void move(struct MANACALA_BOARD *board, int current_index)
             return;
         }
 
-        // This block of code returns to give the player another pick of a pit.
-        // Because of this we can't check to see if his field is empty.
         if(pieces_in_hand == 1 && current_index == current_player_goal){
             pieces_in_hand--;
             board->pits[current_index]++;
