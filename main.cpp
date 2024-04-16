@@ -178,6 +178,9 @@ void move(struct MANACALA_BOARD *board, int current_index)
     board->current_player_turn = !board->current_player_turn;
 }
 
+
+
+//Comment
 int main()
 {
     struct MANACALA_BOARD board;
